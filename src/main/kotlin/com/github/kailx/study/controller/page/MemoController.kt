@@ -1,13 +1,10 @@
 package com.github.kailx.study.controller.page
 
 import com.github.kailx.study.model.Memo
-import java.util.*
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.ModelAttribute
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.*
+
 
 /**
  * @author KaiLx
@@ -31,6 +28,14 @@ class MemoController {
     @PostMapping
     fun post(@ModelAttribute item: Memo, model: Model): String {
         model.addAttribute("items", listOf(item))
+        return "memo"
+    }
+
+    @GetMapping("param/{memo:[a-zA-Z0-9]+}")
+    fun getParams(@PathVariable memo: String,
+                  @RequestParam(required = false, defaultValue = "Default Author") author: String,
+                  model: Model): String {
+        model.addAttribute("items", listOf(Memo(memo, author, null)))
         return "memo"
     }
 }
