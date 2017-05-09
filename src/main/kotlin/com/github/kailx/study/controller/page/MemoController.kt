@@ -13,11 +13,11 @@ class MemoController {
     
     @RequestMapping("")
     fun get(model: Model): String {
-        val items = arrayListOf<MutableMap<String, Any>>()
-        val item = hashMapOf<String, Any>()
-        item.put("memo", "Empty Memo")
-        item.put("author", "Empty Author")
-        items.add(item)
+        val items: MutableList<MutableMap<String, Any>> = mutableListOf()
+        val item: MutableMap<String, Any> = mutableMapOf()
+        item["memo"] = "Empty Memo"
+        item["author"] = "Empty Author"
+        items += item
 
         model.addAttribute("items", items)
         return "memo"
