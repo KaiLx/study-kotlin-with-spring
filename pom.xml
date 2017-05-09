@@ -24,6 +24,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
 		<kotlin.version>1.1.2</kotlin.version>
+		<spek.version>1.1.1</spek.version>
 	</properties>
 
 	<dependencies>
@@ -70,6 +71,12 @@
 
 		<!-- Test -->
 		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-runner</artifactId>
+			<version>1.0.0-M4</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
@@ -77,19 +84,19 @@
 		<dependency>
 			<groupId>org.jetbrains.spek</groupId>
 			<artifactId>spek-api</artifactId>
-			<version>1.1.1</version>
+			<version>${spek.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jetbrains.spek</groupId>
 			<artifactId>spek-junit-platform-engine</artifactId>
-			<version>1.1.1</version>
+			<version>${spek.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.junit.platform</groupId>
-			<artifactId>junit-platform-runner</artifactId>
-			<version>1.0.0-M4</version>
+			<groupId>org.jetbrains.spek</groupId>
+			<artifactId>spek-data-driven-extension</artifactId>
+			<version>${spek.version}</version>
 			<scope>test</scope>
 		</dependency>
 
