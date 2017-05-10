@@ -5,11 +5,10 @@ import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
-import org.junit.Assert.assertNotNull
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import kotlin.test.assertEquals
 
 /**
  * @author KaiLx
@@ -20,51 +19,90 @@ class MemoControllerSpec : Spek({
     val mvc = MockMvcBuilders.standaloneSetup(MemoController()).build()
 
     describe("/memoにGETでアクセスした時") {
-        val result = mvc.perform(get("/memo/"))
+        val result = mvc.perform(get("/memo/")).andReturn()
 
         it("HTTPステータスコードが200で返却される") {
-            result.andExpect(status().isOk)
+            assertEquals(200, result.response.status)
         }
     }
 
-    describe("/memo/subjectにGETでアクセスした時") {
-        val result = mvc.perform(get("/memo/subject"))
+    describe("/memo/paramにGETでアクセスした時") {
+        on("PathVariableが与えられていない場合") {
+            val result = mvc.perform(get("/memo/param")).andReturn()
 
-        it("'subject'memoとして使われる") {
-            TODO()
-        }
-        on("authorがクエリパラメータで与えられなかった場合") {
-            it("'Default Author'がauthorとして使われる") {
-                TODO()
+            it("404エラーとなる") {
+                assertEquals(404, result.response.status)
             }
         }
-        on("authorがクエリパラメータで与えられた場合") {
-            val author = "author"
-            it("'$author'がauthorとして使われる") {
-                TODO()
+        on("PathVariableに英数字のみが与えられていた場合") {
+            val pathVariable = "variable1234"
+            val result = mvc.perform(get("/memo/param/$pathVariable")).andReturn()
+
+            it("HTTPステータスコードが200で返却される") {
+                assertEquals(200, result.response.status)
+            }
+            it("画面に描画されるmemoは$pathVariable となる") {
+                val items = result.modelAndView.modelMap["items"]!! as List<*>
+                assert(items.size == 1)
+
+                val item = items[0] as Memo
+                assert(item.memo == pathVariable)
+            }
+        }
+        on("PathVariableに記号を含む文字列が与えられていた場合") {
+            val result = mvc.perform(get("/memo/param/variable_1234")).andReturn()
+
+            it("404エラーが返却される") {
+                assertEquals(404, result.response.status)
+            }
+        }
+
+        on("QueryParamにauthorが与えられていない場合") {
+            val result = mvc.perform(get("/memo/param/value")).andReturn()
+
+            it("HTTPステータスコードが200で返却される") {
+                assertEquals(200, result.response.status)
+            }
+            it("'Default Author'がauthorとして使われる") {
+                val items = result.modelAndView.modelMap["items"]!! as List<*>
+                assert(items.size == 1)
+
+                val item = items[0] as Memo
+                assert(item.author == "Default Author")
+            }
+        }
+        on("QueryParamにauthorが与えられていた場合") {
+            val authorName = "authorName"
+            val result = mvc.perform(get("/memo/param/value").param("author", authorName)).andReturn()
+
+            it("HTTPステータスコードが200で返却される") {
+                assertEquals(200, result.response.status)
+            }
+            it("'$authorName'がauthorとして使われる") {
+                val items = result.modelAndView.modelMap["items"]!! as List<*>
+                assert(items.size == 1)
+
+                val item = items[0] as Memo
+                assert(item.author == authorName)
             }
         }
     }
 
     describe("/memoにPOSTでアクセスした時") {
-        val result = mvc.perform(
-                post("/memo/")
-                        .param("memo", "memo")
-                        .param("author", "author")
-        )
+        val memoValue = "subject"
+        val authorName = "authorName"
+        val result = mvc.perform(post("/memo/").param("memo", memoValue).param("author", authorName)).andReturn()
 
         it("HTTPステータスコードが200で返却される") {
-            result.andExpect(status().isOk)
+            assertEquals(200, result.response.status)
         }
-        it ("期待通りの値がMemoオブジェクトに格納される") {
-            assertNotNull(result.andReturn().modelAndView.modelMap["items"])
-
-            val items = result.andReturn().modelAndView.modelMap["items"] as List<*>
+        it("期待通りの値がMemoオブジェクトに格納される") {
+            val items = result.modelAndView.modelMap["items"]!! as List<*>
             assert(items.size == 1)
-            
+
             val item = items[0] as Memo
-            assert(item.memo == "memo")
-            assert(item.author == "author")
+            assertEquals(item.memo, memoValue)
+            assertEquals(item.author, authorName)
         }
     }
 })
