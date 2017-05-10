@@ -15,14 +15,7 @@ import org.springframework.web.bind.annotation.*
 class MemoController(val memoService: MemoService) {
     @GetMapping
     fun get(model: Model): String {
-        val t = memoService.join("test", "test2")
-        val items = listOf(
-                mapOf(
-                        "memo" to "Empty Memo",
-                        "author" to "Empty Author"
-                )
-        )
-        model.addAttribute("items", items)
+        model.addAttribute("items", listOf(memoService.join("Join Memo", "Join Author")))
         return "memo"
     }
 
@@ -36,7 +29,7 @@ class MemoController(val memoService: MemoService) {
     fun getParams(@PathVariable memo: String,
                   @RequestParam(required = false, defaultValue = "Default Author") author: String,
                   model: Model): String {
-        model.addAttribute("items", listOf(Memo(memo, author, null)))
+        model.addAttribute("items", listOf(memoService.join(memo, author)))
         return "memo"
     }
 }
