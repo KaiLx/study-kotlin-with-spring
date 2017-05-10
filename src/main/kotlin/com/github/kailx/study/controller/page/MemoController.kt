@@ -1,6 +1,7 @@
 package com.github.kailx.study.controller.page
 
 import com.github.kailx.study.model.Memo
+import com.github.kailx.study.service.MemoService
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.*
@@ -11,10 +12,10 @@ import org.springframework.web.bind.annotation.*
  */
 @Controller
 @RequestMapping("memo")
-class MemoController {
-    
+class MemoController(val memoService: MemoService) {
     @GetMapping
     fun get(model: Model): String {
+        val t = memoService.join("test", "test2")
         val items = listOf(
                 mapOf(
                         "memo" to "Empty Memo",
