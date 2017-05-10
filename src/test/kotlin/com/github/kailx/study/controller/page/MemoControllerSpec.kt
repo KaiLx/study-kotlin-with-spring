@@ -1,6 +1,10 @@
 package com.github.kailx.study.controller.page
 
 import com.github.kailx.study.model.Memo
+import com.github.kailx.study.service.MemoService
+import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.doAnswer
+import com.nhaarman.mockito_kotlin.mock
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
 import org.jetbrains.spek.api.dsl.it
@@ -8,6 +12,7 @@ import org.jetbrains.spek.api.dsl.on
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import java.util.*
 import kotlin.test.assertEquals
 
 /**
@@ -16,7 +21,14 @@ import kotlin.test.assertEquals
 class MemoControllerSpec : Spek({
 
     // beforeSpec的なイメージ
-    val mvc = MockMvcBuilders.standaloneSetup(MemoController()).build()
+    val memoService: MemoService = mock {
+        on { join(any(), any()) }.doAnswer { invocationOnMock ->
+            val memo = invocationOnMock.arguments[0] as String?
+            val author = invocationOnMock.arguments[1] as String?
+            Memo(memo, author, Date())
+        }
+    }
+    val mvc = MockMvcBuilders.standaloneSetup(MemoController(memoService)).build()
 
     describe("/memoにGETでアクセスした時") {
         val result = mvc.perform(get("/memo/")).andReturn()
