@@ -1,5 +1,6 @@
 package com.github.kailx.study.controller.page
 
+import com.github.kailx.study.aspect.ExceptionControllerAdvice
 import com.github.kailx.study.model.Memo
 import com.github.kailx.study.service.MemoService
 import org.springframework.stereotype.Controller
@@ -40,5 +41,10 @@ class MemoController(val memoService: MemoService) {
                   model: Model): String {
         model.addAttribute("items", listOf(memoService.join(memo, author)))
         return "memo"
+    }
+
+    @GetMapping("error")
+    fun error(model: Model) {
+        throw ExceptionControllerAdvice.MemoException()
     }
 }
