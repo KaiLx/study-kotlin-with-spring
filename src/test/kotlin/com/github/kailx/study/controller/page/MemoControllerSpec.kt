@@ -10,6 +10,7 @@ import org.jetbrains.spek.api.dsl.on
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
@@ -30,7 +31,7 @@ class MemoControllerSpec : Spek({
         }
     }
     val controller: MemoController = spy(MemoController(memoService))
-    val mvc = MockMvcBuilders.standaloneSetup(controller).build()
+    val mvc = MockMvcBuilders.standaloneSetup(MemoController(memoService)).build()
 
     describe("/memoにGETでアクセスした時") {
         val result = mvc.perform(get("/memo/")).andReturn()
@@ -111,6 +112,12 @@ class MemoControllerSpec : Spek({
         }
         it("calls MemoService#write with variables($memoValue, $authorName)") {
             verify(memoService, times(1)).write(memoValue, authorName)
+        }
+    }
+
+    describe("access to /memo/error:GET") {
+        it("returns response status 406") {
+            mvc.perform(get("/memo/error")).andExpect(status().isNotAcceptable)
         }
     }
 })
