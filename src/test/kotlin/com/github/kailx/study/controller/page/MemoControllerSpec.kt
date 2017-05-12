@@ -2,16 +2,17 @@ package com.github.kailx.study.controller.page
 
 import com.github.kailx.study.model.Memo
 import com.github.kailx.study.service.MemoService
-import com.nhaarman.mockito_kotlin.any
-import com.nhaarman.mockito_kotlin.doAnswer
-import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.*
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import org.springframework.util.LinkedMultiValueMap
+import org.springframework.util.MultiValueMap
 import java.util.*
 import kotlin.test.assertEquals
 
@@ -28,7 +29,8 @@ class MemoControllerSpec : Spek({
             Memo(memo, author, Date())
         }
     }
-    val mvc = MockMvcBuilders.standaloneSetup(MemoController(memoService)).build()
+    val controller: MemoController = spy(MemoController(memoService))
+    val mvc = MockMvcBuilders.standaloneSetup(controller).build()
 
     describe("/memoにGETでアクセスした時") {
         val result = mvc.perform(get("/memo/")).andReturn()
@@ -42,23 +44,18 @@ class MemoControllerSpec : Spek({
         on("PathVariableが与えられていない場合") {
             val result = mvc.perform(get("/memo/param")).andReturn()
 
-            it("404エラーとなる") {
-                assertEquals(404, result.response.status)
+            it("return status code 200") {
+                assertEquals(200, result.response.status)
+            }
+            it("calls MemoController#get(String, Model)") {
+                verify(controller, times(1)).get(eq("param"), any())
             }
         }
         on("PathVariableに英数字のみが与えられていた場合") {
-            val pathVariable = "variable1234"
-            val result = mvc.perform(get("/memo/param/$pathVariable")).andReturn()
+            val result = mvc.perform(get("/memo/param/variable1234")).andReturn()
 
             it("HTTPステータスコードが200で返却される") {
                 assertEquals(200, result.response.status)
-            }
-            it("画面に描画されるmemoは$pathVariable となる") {
-                val items = result.modelAndView.modelMap["items"]!! as List<*>
-                assert(items.size == 1)
-
-                val item = items[0] as Memo
-                assert(item.memo == pathVariable)
             }
         }
         on("PathVariableに記号を含む文字列が与えられていた場合") {
@@ -103,18 +100,17 @@ class MemoControllerSpec : Spek({
     describe("/memoにPOSTでアクセスした時") {
         val memoValue = "subject"
         val authorName = "authorName"
-        val result = mvc.perform(post("/memo/").param("memo", memoValue).param("author", authorName)).andReturn()
+        val params: MultiValueMap<String, String> = LinkedMultiValueMap()
+        params.add("memo", memoValue)
+        params.add("author", authorName)
 
-        it("HTTPステータスコードが200で返却される") {
-            assertEquals(200, result.response.status)
+        it("redirect to /memo") {
+            mvc.perform(post("/memo").params(params)).andExpect {
+                redirectedUrl("/memo")
+            }
         }
-        it("期待通りの値がMemoオブジェクトに格納される") {
-            val items = result.modelAndView.modelMap["items"]!! as List<*>
-            assert(items.size == 1)
-
-            val item = items[0] as Memo
-            assertEquals(item.memo, memoValue)
-            assertEquals(item.author, authorName)
+        it("calls MemoService#write with variables($memoValue, $authorName)") {
+            verify(memoService, times(1)).write(memoValue, authorName)
         }
     }
 })
