@@ -31,6 +31,8 @@ jobs:
     docker:
       - image: circleci/openjdk:8-jdk
     working_directory: ~/repo
+    trigger_tag:
+      tag: /.*/
     steps:
       - run: echo hello
 workflows:
@@ -43,5 +45,5 @@ workflows:
           requires:
             - build
       - deploy:
-          trigger_tag:
-            tag: /.*/ 
+          requires:
+            - hold
