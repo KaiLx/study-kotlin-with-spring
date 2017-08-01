@@ -31,7 +31,11 @@ jobs:
       - run:
           name: Install AWS CLI
           command: |
-            pip install --upgrade awscli
+            pip install --upgrade --user awscli
+      - run:
+          name: Search aws command
+          command: |
+            which aws
       - run:
           name: Submit Migration job to AWS Batch
           command: |
