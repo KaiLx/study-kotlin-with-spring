@@ -26,7 +26,8 @@ jobs:
       - run:
           name: Install pip
           command: |
-            sudo apt-get update && sudo apt-get install -y python-pip
+            curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
+            sudo python get-pip.py
       - run:
           name: Install AWS CLI
           command: |
