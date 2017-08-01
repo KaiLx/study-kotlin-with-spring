@@ -28,13 +28,11 @@ jobs:
     steps:
       - run: mvn test
   deploy:
+    tag: /.*/
     docker:
       - image: circleci/openjdk:8-jdk
     working_directory: ~/repo
     steps:
-      - deployment:
-          trigger_tag:
-            tag: /.*/
       - run: echo hello
 workflows:
   version: 2
