@@ -38,9 +38,6 @@ workflows:
   build-test-approval-deploy:
     jobs:
       - build
-      - test1:
-          requires:
-            - build
       - hold:
           type: approval
           requires:
