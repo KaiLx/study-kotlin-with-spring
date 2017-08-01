@@ -24,9 +24,9 @@ jobs:
 
       ### Upload AWS
       - run:
-          name: Update pip
+          name: Install pip
           command: |
-            pip install --upgrade pip
+            apt-get install -y pip
       - run:
           name: Install AWS CLI
           command: |
