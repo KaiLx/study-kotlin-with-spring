@@ -35,7 +35,7 @@ jobs:
       - run:
           name: Search aws command
           command: |
-            which aws
+            type aws
       - run:
           name: Submit Migration job to AWS Batch
           command: |
