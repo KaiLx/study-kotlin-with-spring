@@ -37,10 +37,14 @@ jobs:
           command: |
             type aws
       - run:
-          name: Submit Migration job to AWS Batch
+          name: Upload file to S3
           command: |
-            aws batch submit-job                                \
-              --job-name "deploy-test-`date +%s`"                \
-              --job-queue ${JOB_QUEUE_NAME}                     \
-              --job-definition                                  \
-                arn:aws:batch:${AWS_DEFAULT_REGION}:${AWS_ACCOUNT_ID}:job-definition/${JOB_DEFINITION_NAME}:1
+            date > test.txt && aws s3 cp test.txt s3://deploy-test-sms/ 
+#      - run:
+#          name: Submit Migration job to AWS Batch
+#          command: |
+#            aws batch submit-job                                \
+#              --job-name "deploy-test-`date +%s`"                \
+#              --job-queue ${JOB_QUEUE_NAME}                     \
+#              --job-definition                                  \
+#                arn:aws:batch:${AWS_DEFAULT_REGION}:${AWS_ACCOUNT_ID}:job-definition/${JOB_DEFINITION_NAME}:1
