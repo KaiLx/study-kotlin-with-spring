@@ -33,16 +33,16 @@ jobs:
       - run: echo hello
 workflows:
   version: 2
-  build_to_deploy:
+  build-test-approval-deploy:
     jobs:
       - build
       - test1:
-        requires:
-          - build
+          requires:
+            - build
       - hold:
-        type: approval
-        requires:
-          - test1
+          type: approval
+          requires:
+            - test1
       - deploy:
-        requires:
-          - hold
+          requires:
+            - hold
