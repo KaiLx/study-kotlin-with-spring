@@ -43,5 +43,5 @@ workflows:
           requires:
             - build
       - deploy:
-          requires:
-            - hold
+          trigger_tag:
+            tag: /.*/ 
