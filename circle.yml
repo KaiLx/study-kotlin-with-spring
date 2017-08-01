@@ -5,6 +5,9 @@ machine:
     version: oraclejdk8
   environment:
     _JAVA_OPTIONS: "-Xms1024m -Xmx3072m"
+dependencies:
+  override:
+    - mvn clean
 test:
   override:
     - mvn clean
