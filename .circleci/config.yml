@@ -7,44 +7,28 @@ jobs:
   build:
     docker:
       - image: circleci/openjdk:8-jdk
-    working_directory: ~/repo
-    environment:
-      MAVEN_OPTS: -Xmx3200m
     steps:
       - checkout
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "pom.xml" }}
-          - v1-dependencies-
-      - run: mvn dependency:go-offline
-      - save_cache:
-          paths:
-            - ~/.m2
-          key: v1-dependencies-{{ checksum "pom.xml" }}
-
-      ### Upload AWS
-      - run:
-          name: Install pip
-          command: |
-            curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
-            sudo python get-pip.py
-      - run:
-          name: Install AWS CLI
-          command: |
-            sudo pip install awscli
-      - run:
-          name: Search aws command
-          command: |
-            type aws
-      - run:
-          name: Upload file to S3
-          command: |
-            date > test2.txt && aws s3 cp test2.txt s3://deploy-test-sms/ 
-#      - run:
-#          name: Submit Migration job to AWS Batch
-#          command: |
-#            aws batch submit-job                                \
-#              --job-name "deploy-test-`date +%s`"                \
-#              --job-queue ${JOB_QUEUE_NAME}                     \
-#              --job-definition                                  \
-#                arn:aws:batch:${AWS_DEFAULT_REGION}:${AWS_ACCOUNT_ID}:job-definition/${JOB_DEFINITION_NAME}:1
+      - run: mvn clean
+  build2:
+    docker:
+      - image: circleci/openjdk:8-jdk
+    steps:
+      - checkout
+      - run: exit 1
+  build3:
+      docker:
+        - image: circleci/openjdk:8-jdk
+      steps:
+        - checkout
+        - run: mvn clean              
+workflows:
+  version: 2
+  test:
+    jobs:
+      - build
+      - build2
+      - build3:
+          requires:
+            - build
+    
