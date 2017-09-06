@@ -9,26 +9,9 @@ jobs:
       - image: circleci/openjdk:8-jdk
     steps:
       - checkout
-      - run: mvn clean
-  build2:
-    docker:
-      - image: circleci/openjdk:8-jdk
-    steps:
-      - checkout
-      - run: exit 1
-  build3:
-      docker:
-        - image: circleci/openjdk:8-jdk
-      steps:
-        - checkout
-        - run: mvn clean              
-workflows:
-  version: 2
-  test:
-    jobs:
-      - build
-      - build2
-      - build3:
-          requires:
-            - build
-    
+      - run:
+          name: Build
+          command: mvn clean package
+      - run:
+          name: Always do!
+          command: echo "Hello world"
