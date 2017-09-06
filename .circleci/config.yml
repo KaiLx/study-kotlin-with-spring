@@ -11,7 +11,9 @@ jobs:
       - checkout
       - run:
           name: Build
-          command: echo "mvn clean package"
+          command: |
+            echo "mvn clean package"
+            exit 1
       - run:
           name: Always do!
           command: echo "Hello world"
